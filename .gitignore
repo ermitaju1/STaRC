@@ -1,0 +1,15 @@
+data/
+*.zip
+*.tar.gz
+
+bank/
+*.npy
+*.json
+*.pth
+
+*.pth
+*.ckpt
+*.h5
+
+__pycache__/
+.anaconda/
