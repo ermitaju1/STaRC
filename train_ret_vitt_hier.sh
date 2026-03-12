@@ -18,12 +18,12 @@ python dvc_ret.py \
     --batch_size_val=4 \
     --schedule="cosine_with_warmup" \
     --soft_k 10 \
-    --alpha 1.5 \
+    --loss_lambda 2.0 \
     --asot_topk_for_retrieval 5 \
     --asot_K 8 \
     --asot_mu_salbias 0.1 \
     --asot_lambda_frames 0.3 \
-    --stride 8  \
+    --window 8  \
     --self_attn \
     --use_saliency \
     --use_salip \

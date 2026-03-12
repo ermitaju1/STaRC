@@ -77,6 +77,7 @@ class STaRC(torch.nn.Module):
         self.K = args.asot_K
         anchors = torch.randn(self.K, embed_dim)
         self.anchors = nn.Parameter(F.normalize(anchors, dim=-1))
+        self.loss_lambda = int(self.args.loss_lambda * 0.5)
 
 
     def retrieval(self, video_list, memory_bank, args, anchor_ids_list=None):
@@ -271,7 +272,7 @@ class STaRC(torch.nn.Module):
 
         if sal_target is not None:
             sal_loss = loss_saliency(self.args, saliency_scores, sal_target)
-            loss += sal_loss * self.args.alpha
+            loss += sal_loss * self.loss_lambda
 
         return {"loss": loss}, video_dict
 

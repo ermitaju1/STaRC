@@ -183,7 +183,7 @@ class VisionTransformer(nn.Module):
         #         sample_not_ln = x[batch_idx]  # [T, D]
         #         sample = x[batch_idx]
 
-        #         for i in range(0, T - window + 1, self.stride):
+        #         for i in range(0, T - window + 1, self.window):
         #             mini_batch = sample[i : i + window, :]  # [window, D]
         #             mini_batch_not_ln = sample_not_ln[i : i + window, :]
         #             q = k = mini_batch_not_ln

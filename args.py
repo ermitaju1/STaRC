@@ -399,12 +399,12 @@ def get_args_parser():
     parser.add_argument("--use_salip", action='store_true', default=False,
                         help="Test mode for quick checks")    
     
-    parser.add_argument("--alpha", default=0.5, type=float, help="weight for saliency loss")
+    parser.add_argument("--loss_lambda", default=0.5, type=float, help="weight for saliency loss")
     parser.add_argument("--asot_topk_for_retrieval", default=8, type=int, help="number of segments to retrieve")
     parser.add_argument("--asot_K", default=10, type=int, help="number of segments to generate")
     parser.add_argument("--asot_mu_salbias", default=0.15, type=float, help="radius for soft-KNN")
     parser.add_argument("--asot_lambda_frames", default=0.1, type=float, help="radius for soft-KNN")
-    parser.add_argument("--stride", default=8, type=int, help="stride for hierarchical retrieval")
+    parser.add_argument("--window", default=8, type=int, help="window for hierarchical retrieval")
     parser.add_argument("--memory_bank_type", type=str , default='sali4vid', help="clip,hier_clip")
     parser.add_argument("--tau", default=0.5, type=float, help="temperature for saliency loss")
     # parser.add_argument("--soft_k", default=10, type=int)
