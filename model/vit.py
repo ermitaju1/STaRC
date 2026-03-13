@@ -168,40 +168,6 @@ class VisionTransformer(nn.Module):
         x = self.pos_drop(x)
         for blk in self.blocks:
             x = blk(x)
-
-        #!여기에 B, T, D를 넣어도 됨
-
-        # B, T, D = x.shape
-        # # video_clone = x.clone() #!여기에 window를 만들어도 됨
-
-        # # if self.args.self_attn:
-        # vid_zero = torch.zeros_like(x)
-        # count = torch.zeros(B, T, 1, device=x.device)
-
-        # for window in self.window_sizes:
-        #     for batch_idx in range(B):
-        #         sample_not_ln = x[batch_idx]  # [T, D]
-        #         sample = x[batch_idx]
-
-        #         for i in range(0, T - window + 1, self.window):
-        #             mini_batch = sample[i : i + window, :]  # [window, D]
-        #             mini_batch_not_ln = sample_not_ln[i : i + window, :]
-        #             q = k = mini_batch_not_ln
-        #             v = mini_batch.clone()
-        #             scale = D**0.5
-
-        #             attn_scores = torch.matmul(q, k.T) / scale  # [window, window]
-        #             attn_weights = F.softmax(
-        #                 attn_scores, dim=-1
-        #             )  # [window, window]
-        #             attn_output = torch.matmul(attn_weights, v)  # [window, D]
-
-        #             vid_zero[batch_idx, i : i + window, :] += attn_output
-        #             count[batch_idx, i : i + window, :] += 1
-
-        # vid_zero = vid_zero / (count + 1e-6)
-        # # vid_zero = self.norm(vid_zero)
-        # x = x + vid_zero
         x = self.norm(x)
         return x
 
@@ -211,74 +177,6 @@ class VisionTransformer(nn.Module):
         return self.encode_local(x)
 
     def forward_with_global(self, local, mask=None, mode=None):
-        # if mode != "inference":
-        # import pdb; pdb.set_trace()
-        # import pdb; pdb.set_trace()
-        # if mode == "training":
-        #     global_feat = self.global_head(x, mask)  # (B, D)
-        # else:
         x = self.encode_local(local, mode=mode)
-        global_feat  = self.global_head(x, mask)  # (B, D)
-            # x = self.encode_local(x, mode=mode)         # (B, N, D)
+        global_feat  = self.global_head(x, mask)  # (B, D
         return x, global_feat
-
-# def softattention_select(self, memory_bank, window_tokens, mode, uns_video=None):
-#     """
-#     window_tokens: [B, W, D]  # 이미 윈도우 요약된 특징(사전 계산됨)
-#     return:
-#       topk_window_embeds: [B, W, D]  # 각 윈도우별 계층 검색 결과 임베딩
-#       total_window_sents: placeholder 리스트(기존 호환)
-#     """
-#     assert window_tokens.dim() == 3, f"Expected [B, W, D], got {window_tokens.shape}"
-#     assert self.args.ret_option in {"hier_ret", "hier_concat"}
-#     assert self.args.sim_match == "anchor_cos"
-
-#     B, W, D = window_tokens.shape
-#     soft_k   = self.args.soft_k
-#     do_norm  = getattr(self.args, "retrieval_norm", True)  # 코사인 일관성 위해 권장
-
-#     # (선택) 정규화
-#     if do_norm:
-#         window_tokens = F.normalize(window_tokens, dim=-1)
-
-#     topk_window_embeds = []
-#     total_window_sents = []
-
-#     for b in range(B):
-#         batch_out = []
-#         for i in range(W):
-#             target_feature = window_tokens[b, i, :]            # [D]
-#             if do_norm:
-#                 target_feature = F.normalize(target_feature.unsqueeze(0), dim=-1).squeeze(0)
-#             # 계층형 메모리 검색 (이미 클러스터 구조가 memory_bank에 있음)
-#             topk_embed = self.hierarchical_memory_search(target_feature, soft_k, memory_bank)  # [1, D]
-#             batch_out.append(topk_embed)
-#         batch_out = torch.cat(batch_out, dim=0).unsqueeze(0).float()  # [1, W, D]
-#         topk_window_embeds.append(batch_out)
-#         total_window_sents.append('no')  # 필요시 실제 summary로 교체
-
-#     topk_window_embeds = torch.cat(topk_window_embeds, dim=0)  # [B, W, D]
-#     return topk_window_embeds, total_window_sents
-
-# def ret(self, window_tokens, memory_bank, mode, uns_video=None):
-#     """
-#     window_tokens: [B, W, D]  # 이미 준비된 윈도우 요약 특징
-#     return:
-#       ret: [B, W_or_1, D_out]  # ret_encoder=='avg'면 W_or_1=1
-#     """
-#     # 계층 검색
-#     topk_embeds, _ = self.softattention_select(memory_bank, window_tokens, mode, uns_video=uns_video)
-#     if topk_embeds is None or (hasattr(topk_embeds, "__len__") and len(topk_embeds) == 0):
-#         B, _, D = window_tokens.shape
-#         return torch.zeros(B, 1, D, device=window_tokens.device)
-
-#     # 윈도우 축 평균(옵션)
-#     value_vectors = topk_embeds  # [B, W, D]
-#     if getattr(self.args, "ret_encoder", None) == "avg":
-#         value_vectors = value_vectors.mean(dim=1, keepdim=True)  # [B, 1, D]
-
-#     # 투영
-#     if hasattr(self, "ret2t5_proj") and self.ret2t5_proj is not None:
-#         value_vectors = self.ret2t5_proj(value_vectors)          # [B, W_or_1, D_out]
-
-#     return value_vectors
