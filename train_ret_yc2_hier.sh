@@ -2,7 +2,8 @@
 
 export CUDA_VISIBLE_DEVICES=$1
 
-SAVE_DIR="./presave"
+SAVE_DIR="./presave/youcook2"
+
 mkdir -p ${SAVE_DIR}
 python down_t5.py
 python dvc_ret.py \
@@ -13,7 +14,7 @@ python dvc_ret.py \
     --save_dir=${SAVE_DIR} \
     --epochs=10 \
     --lr=1e-5 \
-    --load ckpt/best_model/vid2seq_pretrained/vid2seq_youcook.pth \
+    --load ./ckpt/best_model/vid2seq_pretrained/vid2seq_youcook.pth \
     --combine_datasets youcook \
     --combine_datasets_val youcook \
     --batch_size=4 \
