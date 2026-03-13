@@ -9,7 +9,6 @@ from transformers.modeling_outputs import (
 from util.HD_loss import loss_saliency
 import numpy as np
 import torch.nn.functional as F
-# from .reward import RewardComputer
 import random, math
 # from torch.nn.functional import cosine_similarity
 from .asot import *
@@ -46,8 +45,8 @@ class STaRC(torch.nn.Module):
         self.args = args
         self.t5_model = T5ForConditionalGeneration.from_pretrained(encoder_dropout=enc_drop, decoder_dropout=dec_drop, label_smoothing=label_smoothing,
                                                                    pretrained_model_name_or_path=t5_path, local_files_only=True, is_gated_act="v1_1" in t5_path)
-        self.t5_model.resize_token_embeddings(len(tokenizer) - num_bins)  # remove the weights of the 28 tokens that are not used (32128 vs 32100 in the tokenizer)
-        self.t5_model.resize_token_embeddings(len(tokenizer))  # add time tokens
+        self.t5_model.resize_token_embeddings(len(tokenizer) - num_bins)
+        self.t5_model.resize_token_embeddings(len(tokenizer))
         self.visual_encoder = VisionTransformer(num_features=num_features,
                                                 embed_dim=embed_dim,
                                                 depth=depth,
@@ -128,16 +127,16 @@ class STaRC(torch.nn.Module):
     def forward(self, video, input_tokenized, output_tokenized, timestamp, duration, sal_target = None, mode='None',uns_video=None, memory_bank=None, epoch=0):
         if self.use_video:
             if isinstance(video, dict):  # cached
-                video, video_origin, atts_vis = video["video"], video["video_origin"].clone(), video["atts_vis"] #두번째 video는 video clone
+                video, video_origin, atts_vis = video["video"], video["video_origin"].clone(), video["atts_vis"] 
             else:
                 video_origin = video.clone()
-                video = self.visual_encoder(video)  # B T D #!여기에서 temporal encoding이 되는거 
+                video = self.visual_encoder(video) 
                 if self.proj_v2t is not None:
                     video = self.proj_v2t(video)
                 atts_vis = torch.ones(video.size()[:-1], dtype=torch.long).to(video.device)
             
             B, T, D = video.shape
-            video_clone = video.clone() #!여기에 window를 만들어도 됨
+            video_clone = video.clone()
 
             if self.args.self_attn:
                 vid_zero = torch.zeros_like(video)
@@ -172,7 +171,7 @@ class STaRC(torch.nn.Module):
 
             video_dict = {"video": video_clone, "video_origin": video_origin, "atts_vis": atts_vis} 
 
-            if self.args.use_saliency or self.args.use_ret: # and self.args.sali4vid == False:
+            if self.args.use_saliency or self.args.use_ret: 
                 video_, video_global = self.visual_encoder.forward_with_global(video_clone, mode = "training")  # B T D
 
                 saliency_score = (
@@ -200,12 +199,12 @@ class STaRC(torch.nn.Module):
                 topk = self.args.asot_topk_for_retrieval
 
                 video_list = []
-                anchor_ids_list = []   # ★ 추가: 세그먼트별 앵커 ID 보관
+                anchor_ids_list = []  
 
                 for b in range(len(video_segs)):
                     emb = video_segs[b]        # [N_seg, D]
                     scr = seg_scores[b]        # [N_seg]
-                    metas = segments_meta_list[b]  # ★ 각 세그먼트 메타(여기에 "anchor"가 있음)
+                    metas = segments_meta_list[b] 
                     if emb.dim() == 1: 
                         emb = emb.unsqueeze(0)
                     k = min(topk, emb.size(0))
@@ -213,7 +212,6 @@ class STaRC(torch.nn.Module):
                     top_idx = torch.topk(scr, k=k, dim=0).indices  # [k]
                     video_list.append(emb[top_idx])                # [k, D]
 
-                    # ★ 선택된 세그먼트들의 앵커 id 수집
                     anchor_ids = [int(metas[i]["anchor"]) for i in top_idx.tolist()]
                     anchor_ids_list.append(anchor_ids)
 
@@ -356,7 +354,7 @@ class STaRC(torch.nn.Module):
 
             s_n = (saliency_score - saliency_score.mean(dim=1, keepdim=True)) \
                 / (saliency_score.std(dim=1, keepdim=True) + 1e-6)
-            w = torch.sigmoid(s_n)   # [B, T], 각 프레임별 weight (0~1)
+            w = torch.sigmoid(s_n)   # [B, T]
 
             video_segs, seg_scores, assign_list, anchor_info, segments_meta_list = asot_segments_aux(
                 video_origin,   # [B,T,D]
@@ -372,9 +370,9 @@ class STaRC(torch.nn.Module):
 
             topk = getattr(self.args, "asot_topk_for_retrieval", 8)
 
-            video_list = []                              # [B] 각 배치의 [k, D]
-            selected_frames_per_batch = []               # [B][k]   (세그먼트별 frame indices)
-            selected_anchor_ids_per_batch = []           # [B][k]   (세그먼트별 anchor id)
+            video_list = []                              
+            selected_frames_per_batch = []               
+            selected_anchor_ids_per_batch = []           
 
             for b in range(len(video_segs)):
                 emb = video_segs[b]                      # [N_seg, D]
@@ -407,7 +405,7 @@ class STaRC(torch.nn.Module):
 
         else:
             video_input = video_.clone()
-            atts_vis_input = atts_vis.clone() #torch.cat([atts_vis, atts_sal], dim=1)
+            atts_vis_input = atts_vis.clone() 
 
         if self.use_speech:
             text = self.t5_model.encoder.embed_tokens(input_tokenized['input_ids'])  # B L D
