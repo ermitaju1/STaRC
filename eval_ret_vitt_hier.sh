@@ -9,7 +9,7 @@ python dvc_ret.py \
     --sim_match anchor_cos \
     --sampling origin \
     --save_dir=${SAVE_DIR} \
-    --load /data/shchoi/STaRC/ckpt/best_model/vitt_best_model.pth \
+    --load ./ckpt/best_model/vitt_best_model.pth \
     --epochs=10 \
     --lr=1e-5 \
     --combine_datasets vitt \
