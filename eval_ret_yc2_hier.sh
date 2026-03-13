@@ -1,7 +1,7 @@
 # conda activate HiCM2
 export CUDA_VISIBLE_DEVICES=$1
 
-SAVE_DIR="/data/shchoi/STaRC/presave/presave/yc2__21"
+SAVE_DIR="./presave/presave/youcook2"
 
 python down_t5.py
 python dvc_ret.py \
@@ -10,7 +10,7 @@ python dvc_ret.py \
   --sim_match anchor_cos \
   --sampling origin \
   --save_dir="${SAVE_DIR}" \
-  --load /data/shchoi/STaRC/ckpt/best_model/yc2_best_model.pth  \
+  --load ./ckpt/best_model/yc2_best_model.pth  \
   --lr=1e-5 \
   --combine_datasets youcook \
   --combine_datasets_val youcook \
