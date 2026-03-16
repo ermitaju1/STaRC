@@ -79,10 +79,10 @@ class STaRC(torch.nn.Module):
         self.loss_lambda = int(self.args.loss_lambda * 0.5)
 
 
-    def retrieval(self, video_list, memory_bank, args, anchor_ids_list=None):
+    def retrieval(self, list, memory_bank, args, anchor_ids_list=None):
         soft_k = args.soft_k
 
-        vocab_features = torch.tensor(memory_bank['vid_sent_embeds'], device=video_list[0].device).float()
+        vocab_features = torch.tensor(memory_bank['vid_sent_embeds'], device=list[0].device).float()
         sentences = memory_bank['vide_sent_captions']
         vocab_features = vocab_features.squeeze(1)
         vocab_features = F.normalize(vocab_features, dim=-1)
@@ -98,7 +98,7 @@ class STaRC(torch.nn.Module):
         retrieved_embeds_list = []
         retrieved_anchor_ids_all = [] 
 
-        for b, video in enumerate(video_list):
+        for b, video in enumerate(list):
             video = F.normalize(video, dim=-1)
             scores = torch.matmul(video, vocab_features.T)
             _, indices = torch.topk(scores, k=soft_k, dim=-1)
@@ -127,7 +127,7 @@ class STaRC(torch.nn.Module):
     def forward(self, video, input_tokenized, output_tokenized, timestamp, duration, sal_target = None, mode='None',uns_video=None, memory_bank=None, epoch=0):
         if self.use_video:
             if isinstance(video, dict):  # cached
-                video, video_origin, atts_vis = video["video"], video["video_origin"].clone(), video["atts_vis"] 
+                video, origin, atts_vis = video["video"], video["video_origin"].clone(), video["atts_vis"] 
             else:
                 video_origin = video.clone()
                 video = self.visual_encoder(video) 
@@ -404,7 +404,7 @@ class STaRC(torch.nn.Module):
             atts_vis_input = torch.cat([atts_vis, atts_sal], dim=1)
 
         else:
-            video_input = video_.clone()
+            video_input = video.clone()
             atts_vis_input = atts_vis.clone() 
 
         if self.use_speech:
