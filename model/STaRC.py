@@ -70,8 +70,8 @@ class STaRC(torch.nn.Module):
         self.saliency_tok_proj = nn.Linear(1, self.t5_model.model_dim)
         self.norm = nn.LayerNorm(hidden_dim)
         
-        self.stride = args.stride
-        if self.stride == 8:
+        self.window = args.window
+        if self.window == 8:
             self.window_sizes = [8, 32, 64] #, 32, 64]
         self.K = args.asot_K
         anchors = torch.randn(self.K, embed_dim)
