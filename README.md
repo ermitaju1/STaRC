@@ -2,7 +2,7 @@
 
 # Follow the Saliency: Supervised Saliency for Retrieval-augmented Dense Video Captioning
 
-**CVPR 2026 Accepted (Main Track)**
+**CVPR 2026 Accepted**
 
 <img src="https://github.com/user-attachments/assets/9a2fd090-c2e2-43f3-a1a7-6183396df23b" width="100%" alt="STaRC Overview">
 
