@@ -29,4 +29,5 @@ python dvc_ret.py \
     --window 8 \
     --use_saliency \
     --use_salip \
-    --self_attn
+    --self_attn \
+    --use_ret
