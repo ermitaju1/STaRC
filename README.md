@@ -16,8 +16,7 @@
 ---
 
 ## 📂 Resources
-You can download the **Caption Datastore** and **Model Weights** from the following link:
 
-> **[Download from Google Drive](https://drive.google.com/drive/folders/1CwqmRerzUuIIKdZ3bmj21agHsxpd_3ro?usp=sharing)**
-
+* [**Caption Datastore & Model Weights**](https://drive.google.com/drive/folders/1CwqmRerzUuIIKdZ3bmj21agHsxpd_3ro?usp=sharing)
+* [**Datasets**](https://drive.google.com/drive/folders/1Gbg_eXtoLE2x1eS_HaA268Hx7cDjodRG?usp=drive_link)
 ---
